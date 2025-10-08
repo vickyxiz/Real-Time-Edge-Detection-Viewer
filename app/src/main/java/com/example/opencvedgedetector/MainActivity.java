@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
         }
 
@@ -54,10 +53,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, loaderCallback);
         } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
             loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
@@ -65,14 +62,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     protected void onPause() {
         super.onPause();
-        if (cameraBridgeViewBase != null) {
-            cameraBridgeViewBase.disableView();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         if (cameraBridgeViewBase != null) {
             cameraBridgeViewBase.disableView();
         }
@@ -95,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // Declare the native C++ function
     public native void processFrame(long matAddr);
 
-    // Load the 'native-lib' library on startup
+    // Load the 'native-lib'
     static {
         System.loadLibrary("native-lib");
     }
