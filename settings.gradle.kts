@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "OpenCVEdgeDetector"
 include(":app")
+include(":sdk")
