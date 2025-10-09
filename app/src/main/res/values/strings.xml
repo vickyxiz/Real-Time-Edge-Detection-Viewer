@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">OpenCVEdgeDetector</string>
+    <string name="toggle_filter">Toggle Filter</string>
 </resources>

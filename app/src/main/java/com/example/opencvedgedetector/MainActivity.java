@@ -10,29 +10,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Button;
 
-import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
+    // For FPS Counter
+    int frameCount = 0;
+    long startTime = 0;
     private static final String TAG = "MainActivity";
     private CameraBridgeViewBase cameraBridgeViewBase;
-
-    private final BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            if (status == LoaderCallbackInterface.SUCCESS) {
-                Log.i(TAG, "OpenCV loaded successfully");
-                cameraBridgeViewBase.enableView();
-            } else {
-                super.onManagerConnected(status);
-            }
-        }
-    };
+    private boolean applyFilter = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +38,22 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         cameraBridgeViewBase = findViewById(R.id.camera_view);
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         cameraBridgeViewBase.setCvCameraViewListener(this);
+
+        Button toggleButton = findViewById(R.id.toggle_button);
+        toggleButton.setOnClickListener(v -> {
+            applyFilter = !applyFilter;
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (!OpenCVLoader.initDebug()) {
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, loaderCallback);
+        // The modern OpenCV 4 initialization
+        if (OpenCVLoader.initDebug()) {
+            Log.d(TAG, "OpenCV is configured successfully");
+            cameraBridgeViewBase.enableView();
         } else {
-            loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            Log.d(TAG, "OpenCV did not load");
         }
     }
 
@@ -75,16 +73,26 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        // FPS Counter logic starts
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis();
+        }
+        frameCount++;
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - startTime > 1000) {
+            Log.d(TAG, "FPS: " + frameCount);
+            startTime = 0;
+            frameCount = 0;
+        }
+        // FPS Counter logic ends
+
         Mat frame = inputFrame.rgba();
-        // Call the native C++ function
-        processFrame(frame.getNativeObjAddr());
+        processFrame(frame.getNativeObjAddr(), applyFilter); // Pass the boolean here
         return frame;
     }
 
-    // Declare the native C++ function
-    public native void processFrame(long matAddr);
+    public native void processFrame(long matAddr, boolean applyFilter);
 
-    // Load the 'native-lib'
     static {
         System.loadLibrary("native-lib");
     }
