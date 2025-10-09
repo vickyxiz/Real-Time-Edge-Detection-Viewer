@@ -28,8 +28,10 @@ This project is a submission for the **Android + OpenCV-C++ + OpenGL Assessment*
 
 Here is a screenshot of the application running on an Android emulator. It shows the real-time Canny edge detection filter applied to the virtual camera scene, with the filter toggle button at the bottom.
 
-![App Screenshot](app_screenshot.png)
-
+![App Screenshot 1](screenshot_1.png)
+![App Screenshot 2](screenshot_2.png)
+![App Screenshot 3](screenshot_3.png)
+git add .
 ---
 
 ## 🧠 Architecture Explanation
